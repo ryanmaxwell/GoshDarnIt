@@ -12,10 +12,11 @@
 		94713A521D99C4500018821A /* GoshDarnIt.h in Headers */ = {isa = PBXBuildFile; fileRef = 94713A441D99C4500018821A /* GoshDarnIt.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		94713A5D1D99C4850018821A /* ProfanityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94713A5C1D99C4850018821A /* ProfanityFilter.swift */; };
 		94713A5E1D99C4850018821A /* ProfanityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94713A5C1D99C4850018821A /* ProfanityFilter.swift */; };
-		9497B2011D9DF0880054CA2E /* Profanity.json in Resources */ = {isa = PBXBuildFile; fileRef = 9497B2001D9DF0880054CA2E /* Profanity.json */; };
-		9497B2021D9DF09E0054CA2E /* Profanity.json in Resources */ = {isa = PBXBuildFile; fileRef = 9497B2001D9DF0880054CA2E /* Profanity.json */; };
 		9497B20A1D9E26760054CA2E /* GoshDarnItObjCTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9497B2091D9E26760054CA2E /* GoshDarnItObjCTests.m */; };
 		9497B20C1D9E26760054CA2E /* GoshDarnIt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94713A411D99C4500018821A /* GoshDarnIt.framework */; };
+		9497B2131D9F42B90054CA2E /* Profanity.json in Resources */ = {isa = PBXBuildFile; fileRef = 9497B2121D9F42B90054CA2E /* Profanity.json */; };
+		9497B2141D9F42DD0054CA2E /* Profanity.json in Resources */ = {isa = PBXBuildFile; fileRef = 9497B2121D9F42B90054CA2E /* Profanity.json */; };
+		9497B2151D9F42DE0054CA2E /* Profanity.json in Resources */ = {isa = PBXBuildFile; fileRef = 9497B2121D9F42B90054CA2E /* Profanity.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,10 +44,10 @@
 		94713A4F1D99C4500018821A /* GoshDarnItTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoshDarnItTests.swift; sourceTree = "<group>"; };
 		94713A511D99C4500018821A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		94713A5C1D99C4850018821A /* ProfanityFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProfanityFilter.swift; path = ../Classes/ProfanityFilter.swift; sourceTree = "<group>"; };
-		9497B2001D9DF0880054CA2E /* Profanity.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Profanity.json; sourceTree = "<group>"; };
 		9497B2071D9E26760054CA2E /* GoshDarnItObjCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoshDarnItObjCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9497B2091D9E26760054CA2E /* GoshDarnItObjCTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GoshDarnItObjCTests.m; sourceTree = "<group>"; };
 		9497B20B1D9E26760054CA2E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9497B2121D9F42B90054CA2E /* Profanity.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = Profanity.json; path = ../Resources/Profanity.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,7 +128,7 @@
 		94713A5F1D99C4980018821A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				9497B2001D9DF0880054CA2E /* Profanity.json */,
+				9497B2121D9F42B90054CA2E /* Profanity.json */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -261,7 +262,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9497B2011D9DF0880054CA2E /* Profanity.json in Resources */,
+				9497B2131D9F42B90054CA2E /* Profanity.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,7 +270,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9497B2021D9DF09E0054CA2E /* Profanity.json in Resources */,
+				9497B2141D9F42DD0054CA2E /* Profanity.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +278,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9497B2151D9F42DE0054CA2E /* Profanity.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -551,6 +553,7 @@
 				9497B2101D9E26770054CA2E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

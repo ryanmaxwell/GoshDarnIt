@@ -10,8 +10,8 @@ import Foundation
 
 class ProfanityResources {
     
-    class func profanityFileURL() -> NSURL? {
-        return NSBundle(forClass: ProfanityResources.self).URLForResource("Profanity", withExtension: "json")
+    class func profanityFileURL() -> URL? {
+        return Bundle(for: ProfanityResources.self).url(forResource: "Profanity", withExtension: "json")
     }
 }
 
@@ -24,9 +24,9 @@ struct ProfanityDictionary {
         }
         
         do {
-            let fileData = try NSData(contentsOfURL: fileURL, options: NSDataReadingOptions.DataReadingUncached)
+            let fileData = try Data(contentsOf: fileURL, options: NSData.ReadingOptions.uncached)
             
-            guard let words = try NSJSONSerialization.JSONObjectWithData(fileData, options: []) as? [String] else {
+            guard let words = try JSONSerialization.jsonObject(with: fileData, options: []) as? [String] else {
                 return Set<String>()
             }
             
@@ -40,14 +40,14 @@ struct ProfanityDictionary {
 
 public struct ProfanityFilter {
     
-    static func censorString(string: String) -> String {
+    static func censorString(_ string: String) -> String {
         var cleanString = string
         
         for word in string.profaneWords() {
             
-            let cleanWord = "".stringByPaddingToLength(word.characters.count, withString: "*", startingAtIndex: 0)
+            let cleanWord = "".padding(toLength: word.characters.count, withPad: "*", startingAt: 0)
             
-            cleanString = cleanString.stringByReplacingOccurrencesOfString(word, withString: cleanWord, options: [.CaseInsensitiveSearch], range: nil)
+            cleanString = cleanString.replacingOccurrences(of: word, with: cleanWord, options: [.caseInsensitive], range: nil)
         }
         
         return cleanString
@@ -57,13 +57,14 @@ public struct ProfanityFilter {
 public extension String {
     
     public func profaneWords() -> Set<String> {
-        let delimiterSet = NSMutableCharacterSet()
-        delimiterSet.formUnionWithCharacterSet(NSCharacterSet.punctuationCharacterSet())
-        delimiterSet.formUnionWithCharacterSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         
-        let words = Set(self.lowercaseString.componentsSeparatedByCharactersInSet(delimiterSet))
+        var delimiterSet = CharacterSet()
+        delimiterSet.formUnion(CharacterSet.punctuationCharacters)
+        delimiterSet.formUnion(CharacterSet.whitespacesAndNewlines)
         
-        return words.intersect(ProfanityDictionary.profaneWords)
+        let words = Set(self.lowercased().components(separatedBy: delimiterSet))
+        
+        return words.intersection(ProfanityDictionary.profaneWords)
     }
     
     public func containsProfanity() -> Bool {
@@ -82,7 +83,7 @@ public extension String {
 public extension NSString {
     
     public func censored() -> NSString {
-        return ProfanityFilter.censorString(self as String)
+        return ProfanityFilter.censorString(self as String) as NSString
     }
 }
 
@@ -107,15 +108,15 @@ public extension NSAttributedString {
         
         for word in profaneWords {
             
-            let cleanWord = "".stringByPaddingToLength(word.characters.count, withString: "*", startingAtIndex: 0)
+            let cleanWord = "".padding(toLength: word.characters.count, withPad: "*", startingAt: 0)
             
-            var range = (cleanString.string as NSString).rangeOfString(word, options: .CaseInsensitiveSearch)
+            var range = (cleanString.string as NSString).range(of: word, options: .caseInsensitive)
             while range.location != NSNotFound {
-                let attributes = cleanString.attributesAtIndex(range.location, effectiveRange: nil)
+                let attributes = cleanString.attributes(at: range.location, effectiveRange: nil)
                 let cleanAttributedString = NSAttributedString(string: cleanWord, attributes: attributes)
-                cleanString.replaceCharactersInRange(range, withAttributedString: cleanAttributedString)
+                cleanString.replaceCharacters(in: range, with: cleanAttributedString)
                 
-                range = (cleanString.string as NSString).rangeOfString(word, options: .CaseInsensitiveSearch)
+                range = (cleanString.string as NSString).range(of: word, options: .caseInsensitive)
             }
         }
         

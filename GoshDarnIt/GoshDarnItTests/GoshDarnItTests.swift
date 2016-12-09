@@ -26,7 +26,7 @@ class GoshDarnItTests: XCTestCase {
         
         let input = "Fuck it"
         
-        let censored = input.censored()
+        let censored = input.censored([FilterType.profanity])
         
         XCTAssertEqual("**** it", censored)
     }
@@ -34,8 +34,7 @@ class GoshDarnItTests: XCTestCase {
     func testStringCensor() {
         
         var input = "Fuck it"
-        
-        input.censor()
+        input.censor([FilterType.profanity])
         
         XCTAssertEqual("**** it", input)
     }
@@ -44,7 +43,7 @@ class GoshDarnItTests: XCTestCase {
         
         let input: NSString = "Fuck it"
         
-        let censored = input.censored()
+        let censored = input.censored([FilterType.profanity])
         
         XCTAssertEqual("**** it", censored)
     }
@@ -52,7 +51,7 @@ class GoshDarnItTests: XCTestCase {
     func testNSMutableString() {
         
         let input: NSMutableString = "Fuck it"
-        input.censor()
+        input.censor([FilterType.profanity])
         
         XCTAssertEqual("**** it", input)
     }
@@ -63,39 +62,54 @@ class GoshDarnItTests: XCTestCase {
     func testSingle() {
         let input = "crap"
         
-        XCTAssertEqual("****", input.censored())
+        XCTAssertEqual("****", input.censored([FilterType.profanity]))
     }
     
     func testCasing() {
         let input = "cRap"
         
-        XCTAssertEqual("****", input.censored())
+        XCTAssertEqual("****", input.censored([FilterType.profanity]))
     }
     
     func testAllowSubstring() {
         let input = "I buy crepes at the crapery"
-        XCTAssertEqual("I buy crepes at the crapery", input.censored())
+        XCTAssertEqual("I buy crepes at the crapery", input.censored([FilterType.profanity]))
     }
     
     func testMultiple() {
         
         let input = "Fucking wanker"
         
-        XCTAssertEqual("******* ******", input.censored())
+        XCTAssertEqual("******* ******", input.censored([FilterType.profanity]))
     }
     
     func testPunctuation() {
         let input = "This is shit, this testing."
-        XCTAssertEqual("This is ****, this testing.", input.censored())
+        XCTAssertEqual("This is ****, this testing.", input.censored([FilterType.profanity]))
     }
     
     func testPunctuationInString() {
         let input = "This is shit-ass-fuck"
-        XCTAssertEqual("This is ****-***-****", input.censored())
+        XCTAssertEqual("This is ****-***-****", input.censored([FilterType.profanity]))
     }
     
     func testMultipleLines() {
         let input = "The first line\nshit\nand the third"
-        XCTAssertEqual("The first line\n****\nand the third", input.censored())
+        XCTAssertEqual("The first line\n****\nand the third", input.censored([FilterType.profanity]))
+    }
+    
+    func testEmailFilter() {
+       let input = "johnSmith@gmail.com"
+        XCTAssertEqual("*******************", input.censored([FilterType.emails]))
+    }
+    
+    func testWebsiteFilter() {
+        let input = "www.google.ca"
+        XCTAssertEqual("*************", input.censored([FilterType.websites]))
+    }
+    
+    func testAllFilters() {
+        let input = "Fuck this www.google.ca email me at johnSmith@gmail.com"
+        XCTAssertEqual("**** this ************* email me at *******************", input.censored([FilterType.emails, .profanity, .websites]))
     }
 }

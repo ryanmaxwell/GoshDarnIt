@@ -40,21 +40,60 @@ struct ProfanityDictionary {
 
 public struct ProfanityFilter {
     
-    static func censorString(_ string: String) -> String {
+    static func censorString(_ string: String, _ filter: [FilterType]) -> String {
         var cleanString = string
         
-        for word in string.profaneWords() {
-            
-            let cleanWord = "".padding(toLength: word.characters.count, withPad: "*", startingAt: 0)
-            
-            cleanString = cleanString.replacingOccurrences(of: word, with: cleanWord, options: [.caseInsensitive], range: nil)
+        if filter.contains(.profanity) {
+            for word in string.profaneWords() {
+                let cleanWord = word.replaceWithAsterisks()
+                cleanString = cleanString.replacingOccurrences(of: word, with: cleanWord, options: [.caseInsensitive], range: nil)
+            }
         }
         
+        if filter.contains(.emails) || filter.contains(.websites) {
+            cleanString = self.blockOther(cleanString, filter)
+        }
+        
+        return cleanString
+    }
+    
+    static func blockOther(_ string: String, _ filter: [FilterType]) -> String {
+        var cleanString = string
+        
+        for words in string.components(separatedBy: " ") {
+            if words.isValidEmail() && filter.contains(.emails){
+                cleanString = cleanString.replacingOccurrences(of: words, with: words.replaceWithAsterisks())
+            } else if words.isValidWebsite() && filter.contains(.websites) {
+                cleanString = cleanString.replacingOccurrences(of: words, with: words.replaceWithAsterisks())
+            }
+            
+        }
         return cleanString
     }
 }
 
 public extension String {
+    
+    func isValidWebsite() -> Bool {
+        let websiteRegEx = "[A-Z0-0a-z]+\\.[A-Za-z.,-=+]{2,}"
+        
+        let websiteRegEx2 = "[A-Za-z]+\\.[A-Z0-0a-z]+\\.[A-Za-z.,-=+]{2,}"
+        let webTest2 = NSPredicate(format: "SELF MATCHES %@", websiteRegEx2)
+        let webTest = NSPredicate(format: "SELF MATCHES %@", websiteRegEx)
+        
+        if webTest.evaluate(with: self) ||  webTest2.evaluate(with: self)  {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func isValidEmail() -> Bool {
+        // print("validate calendar: \(testStr)")
+        let emailRegEx = "[A-Z0-9a-z._%+-]+[@][A-Za-z0-9.,-=+]{2,}"
+        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: self)
+    }
     
     public func profaneWords() -> Set<String> {
         
@@ -64,62 +103,125 @@ public extension String {
         
         let words = Set(self.lowercased().components(separatedBy: delimiterSet))
         
-        return words.intersection(ProfanityDictionary.profaneWords)
+        let x = words.intersection(ProfanityDictionary.profaneWords)
+        
+        return x
     }
     
     public func containsProfanity() -> Bool {
         return !profaneWords().isEmpty
     }
     
-    public func censored() -> String {
-        return ProfanityFilter.censorString(self)
+    public func censored(_ filterDict: [String: Bool]) -> String {
+        let filters = getFiltersFromDict(filterDict)
+        return ProfanityFilter.censorString(self, filters)
     }
     
-    public mutating func censor() {
-        self = censored()
+    public func censored(_ filter: [FilterType]) -> String {
+        return ProfanityFilter.censorString(self, filter)
+    }
+    
+    public mutating func censor(_ filter: [FilterType] = [.profanity]) {
+        self = censored(filter)
+    }
+    func replaceWithAsterisks() -> String {
+        return "".padding(toLength: self.characters.count, withPad: "*", startingAt: 0)
     }
 }
 
 public extension NSString {
     
     public func censored() -> NSString {
-        return ProfanityFilter.censorString(self as String) as NSString
+       return censored([FilterType.profanity])
+    }
+    
+    public func censored(_ filterDict: [String: Bool]) -> NSString {
+        let filters = getFiltersFromDict(filterDict)
+        return ProfanityFilter.censorString(self as String, filters) as NSString
+    }
+    
+    public func censored(_ filter: [FilterType]) -> NSString {
+        return ProfanityFilter.censorString(self as String, filter) as NSString
     }
 }
 
 public extension NSMutableString {
     
     public func censor() {
-        setString(ProfanityFilter.censorString(self as String))
+        censor([FilterType.profanity])
     }
+    
+    public func censor(_ filterDict: [String: Bool]) {
+        let filters = getFiltersFromDict(filterDict)
+        
+        setString(ProfanityFilter.censorString(self as String, filters))
+    }
+    
+    public func censor(_ filter: [FilterType]) {
+        setString(ProfanityFilter.censorString(self as String, filter))
+    }
+    
+}
+
+public enum FilterType: Int { case profanity = 0, websites, emails }
+
+public func getFiltersFromDict(_ filterDict: [String: Bool]) -> [FilterType] {
+    var types = [FilterType]()
+    for (key,value) in filterDict {
+        if key == "profanity" && value {
+            types.append(.profanity)
+        } else if key == "emails" && value {
+            types.append(.emails)
+        } else if key == "websites" && value {
+            types.append(.websites)
+        }
+    }
+    return types
 }
 
 public extension NSAttributedString {
     
+    
     public func censored() -> NSAttributedString {
+        return censored([FilterType.profanity])
+        
+    }
+    
+    
+    public func censored(_ filterDict: [String: Bool]) -> NSAttributedString {
+       let filters = getFiltersFromDict(filterDict)
+        return censored(filters)
+    }
+    
+    public func censored(_ filter: [FilterType]) -> NSAttributedString {
         
         let profaneWords = string.profaneWords()
+        var cleanString = NSMutableAttributedString(attributedString: self)
+        
+        if filter.contains(.emails) || filter.contains(.websites) {
+            let filteredWord = cleanString.string.censored(filter)
+            cleanString = NSMutableAttributedString(string: filteredWord)
+        }
         
         if profaneWords.isEmpty {
-            return self
+            return cleanString
         }
         
-        let cleanString = NSMutableAttributedString(attributedString: self)
-        
-        for word in profaneWords {
-            
-            let cleanWord = "".padding(toLength: word.characters.count, withPad: "*", startingAt: 0)
-            
-            var range = (cleanString.string as NSString).range(of: word, options: .caseInsensitive)
-            while range.location != NSNotFound {
-                let attributes = cleanString.attributes(at: range.location, effectiveRange: nil)
-                let cleanAttributedString = NSAttributedString(string: cleanWord, attributes: attributes)
-                cleanString.replaceCharacters(in: range, with: cleanAttributedString)
+        if filter.contains(.profanity) {
+            for word in profaneWords {
                 
-                range = (cleanString.string as NSString).range(of: word, options: .caseInsensitive)
+                let cleanWord = word.replaceWithAsterisks()
+                
+                var range = (cleanString.string as NSString).range(of: word, options: .caseInsensitive)
+                while range.location != NSNotFound {
+                    let attributes = cleanString.attributes(at: range.location, effectiveRange: nil)
+                    let cleanAttributedString = NSAttributedString(string: cleanWord, attributes: attributes)
+                    cleanString.replaceCharacters(in: range, with: cleanAttributedString)
+                    
+                    range = (cleanString.string as NSString).range(of: word, options: .caseInsensitive)
+                }
             }
         }
-        
         return cleanString
     }
 }

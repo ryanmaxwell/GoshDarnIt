@@ -97,4 +97,19 @@ class GoshDarnItTests: XCTestCase {
         let input = "The first line\nshit\nand the third"
         XCTAssertEqual("The first line\n****\nand the third", input.censored([FilterType.profanity]))
     }
+    
+    func testEmailFilter() {
+       let input = "johnSmith@gmail.com"
+        XCTAssertEqual("*******************", input.censored([FilterType.emails]))
+    }
+    
+    func testWebsiteFilter() {
+        let input = "www.google.ca"
+        XCTAssertEqual("*************", input.censored([FilterType.websites]))
+    }
+    
+    func testAllFilters() {
+        let input = "Fuck this www.google.ca email me at johnSmith@gmail.com"
+        XCTAssertEqual("**** this ************* email me at *******************", input.censored([FilterType.emails, .profanity, .websites]))
+    }
 }
